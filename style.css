@@ -1,700 +1,405 @@
-// =========================
-// ตั้งค่าการคำนวณ
-// =========================
 
-const FT_RATE = 0.3972;
-const VAT_RATE = 0.07;
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
 
-// ชื่อที่ใช้เก็บข้อมูลใน Browser
-const HISTORY_KEY = "electricityCalculatorHistory";
-const TRASH_KEY = "electricityCalculatorTrash";
+body {
+    font-family: "Tahoma", "Arial", sans-serif;
+    background: linear-gradient(135deg, #2563eb, #06b6d4);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    color: #1f2937;
+}
 
+.container {
+    width: 100%;
+    max-width: 520px;
+}
 
-// =========================
-// ดึง Element
-// =========================
+.calculator {
+    background: #ffffff;
+    border-radius: 20px;
+    padding: 35px;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.18);
+}
 
-const unitsInput = document.getElementById("units");
-const errorElement = document.getElementById("error");
+h1 {
+    text-align: center;
+    color: #1d4ed8;
+    margin-bottom: 10px;
+    font-size: 28px;
+}
 
-const calculateBtn = document.getElementById("calculateBtn");
-const resetBtn = document.getElementById("resetBtn");
-
-const result = document.getElementById("result");
-
-const baseCostElement = document.getElementById("baseCost");
-const ftCostElement = document.getElementById("ftCost");
-const beforeVatElement = document.getElementById("beforeVat");
-const vatCostElement = document.getElementById("vatCost");
-const totalCostElement = document.getElementById("totalCost");
-
-const calculatorTab = document.getElementById("calculatorTab");
-const historyTab = document.getElementById("historyTab");
-
-const calculatorPage = document.getElementById("calculatorPage");
-const historyPage = document.getElementById("historyPage");
-const trashPage = document.getElementById("trashPage");
-
-const historyList = document.getElementById("historyList");
-const trashList = document.getElementById("trashList");
-
-const trashBtn = document.getElementById("trashBtn");
-const backHistoryBtn = document.getElementById("backHistoryBtn");
-
-
-// =========================
-// โหลดข้อมูล
-// =========================
-
-let history = loadData(HISTORY_KEY);
-let trash = loadData(TRASH_KEY);
-
-
-// =========================
-// ฟังก์ชัน LocalStorage
-// =========================
-
-function loadData(key) {
-
-    try {
-
-        const data = localStorage.getItem(key);
-
-        if (!data) {
-            return [];
-        }
-
-        const parsed = JSON.parse(data);
-
-        return Array.isArray(parsed) ? parsed : [];
-
-    } catch (error) {
-
-        console.error("โหลดข้อมูลไม่สำเร็จ:", error);
-
-        return [];
-    }
+.subtitle {
+    text-align: center;
+    color: #6b7280;
+    margin-bottom: 25px;
+    line-height: 1.6;
 }
 
 
-function saveHistory() {
+/* ================================
+   แท็บ
+================================ */
 
-    localStorage.setItem(
-        HISTORY_KEY,
-        JSON.stringify(history)
-    );
+.tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 25px;
+    background: #f3f4f6;
+    padding: 5px;
+    border-radius: 12px;
+}
+
+.tab {
+    flex: 1;
+    border: none;
+    background: transparent;
+    color: #6b7280;
+    padding: 11px 8px;
+    border-radius: 9px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.tab:hover {
+    background: #e5e7eb;
+}
+
+.tab.active {
+    background: #2563eb;
+    color: white;
 }
 
 
-function saveTrash() {
+/* ================================
+   ฟอร์ม
+================================ */
 
-    localStorage.setItem(
-        TRASH_KEY,
-        JSON.stringify(trash)
-    );
+.form-group {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+input {
+    width: 100%;
+    padding: 14px;
+    border: 2px solid #d1d5db;
+    border-radius: 10px;
+    font-size: 18px;
+    outline: none;
+    transition: 0.2s;
+}
+
+input:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.error {
+    display: block;
+    color: #dc2626;
+    margin-top: 7px;
+    min-height: 20px;
 }
 
 
-// =========================
-// คำนวณค่าไฟฟ้าฐาน
-// =========================
+/* ================================
+   ปุ่ม
+================================ */
 
-function calculateBaseCost(units) {
+.button-group {
+    display: flex;
+    gap: 12px;
+    margin-top: 10px;
+}
 
-    let cost = 0;
+button {
+    border: none;
+    padding: 14px;
+    border-radius: 10px;
+    font-size: 17px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+}
 
-    if (units <= 15) {
+.button-group button {
+    flex: 1;
+}
 
-        cost = units * 2.3488;
+.calculate-btn {
+    background: #2563eb;
+    color: white;
+}
 
-    } else {
+.calculate-btn:hover {
+    background: #1d4ed8;
+    transform: translateY(-1px);
+}
 
-        cost += 15 * 2.3488;
+.reset-btn {
+    background: #e5e7eb;
+    color: #374151;
+}
 
-        if (units <= 25) {
-
-            cost += (units - 15) * 2.9882;
-
-        } else {
-
-            cost += 10 * 2.9882;
-
-            if (units <= 35) {
-
-                cost += (units - 25) * 3.2405;
-
-            } else {
-
-                cost += 10 * 3.2405;
-
-                if (units <= 100) {
-
-                    cost += (units - 35) * 3.6237;
-
-                } else {
-
-                    cost += 65 * 3.6237;
-
-                    if (units <= 150) {
-
-                        cost += (units - 100) * 3.7171;
-
-                    } else {
-
-                        cost += 50 * 3.7171;
-
-                        if (units <= 400) {
-
-                            cost += (units - 150) * 4.2218;
-
-                        } else {
-
-                            cost += 250 * 4.2218;
-
-                            cost += (units - 400) * 4.4217;
-
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    return cost;
+.reset-btn:hover {
+    background: #d1d5db;
 }
 
 
-// =========================
-// คำนวณทั้งหมด
-// =========================
+/* ================================
+   ผลการคำนวณ
+================================ */
 
-function calculateValues(units) {
+.result {
+    margin-top: 30px;
+    background: #f8fafc;
+    border-radius: 15px;
+    padding: 22px;
+    border: 1px solid #e5e7eb;
+}
 
-    const baseCost = calculateBaseCost(units);
+.result h2 {
+    text-align: center;
+    margin-bottom: 18px;
+    color: #1e40af;
+}
 
-    const ftCost = units * FT_RATE;
+.result-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    padding: 12px 0;
+    border-bottom: 1px solid #e5e7eb;
+}
 
-    const beforeVat = baseCost + ftCost;
+.result-row strong {
+    color: #111827;
+}
 
-    const vatCost = beforeVat * VAT_RATE;
+.total {
+    margin-top: 15px;
+    padding: 18px;
+    background: #dbeafe;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    text-align: center;
+}
 
-    const totalCost = beforeVat + vatCost;
+.total span {
+    font-size: 16px;
+}
 
-    return {
-        baseCost,
-        ftCost,
-        beforeVat,
-        vatCost,
-        totalCost
-    };
+.total strong {
+    font-size: 26px;
+    color: #1d4ed8;
 }
 
 
-// =========================
-// สร้าง ID
-// =========================
+/* ================================
+   ประวัติ
+================================ */
 
-function createId() {
+.history-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 18px;
+}
 
-    return Date.now().toString() +
-        Math.random().toString(36).substring(2);
+.history-header h2 {
+    color: #1e40af;
+    font-size: 21px;
+}
+
+.history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.history-item {
+    background: #f8fafc;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 15px;
+}
+
+.history-top {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    align-items: flex-start;
+}
+
+.history-date {
+    color: #6b7280;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.history-units {
+    font-size: 15px;
+    margin-top: 6px;
+}
+
+.history-total {
+    color: #1d4ed8;
+    font-size: 20px;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.history-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.history-actions button {
+    flex: 1;
+    padding: 9px;
+    font-size: 13px;
+}
+
+.restore-btn {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.restore-btn:hover {
+    background: #bbf7d0;
+}
+
+.delete-btn {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+.delete-btn:hover {
+    background: #fecaca;
+}
+
+.trash-btn {
+    background: #f3f4f6;
+    color: #374151;
+    padding: 9px 12px;
+    font-size: 13px;
+}
+
+.trash-btn:hover {
+    background: #e5e7eb;
+}
+
+.small-btn {
+    padding: 9px 12px;
+    font-size: 13px;
 }
 
 
-// =========================
-// แสดงผล
-// =========================
+/* ================================
+   ไม่มีข้อมูล
+================================ */
 
-function displayResult(values) {
+.empty-history {
+    text-align: center;
+    padding: 30px 15px;
+    color: #6b7280;
+    background: #f8fafc;
+    border-radius: 12px;
+    border: 1px dashed #d1d5db;
+}
 
-    baseCostElement.textContent =
-        values.baseCost.toFixed(2) + " บาท";
-
-    ftCostElement.textContent =
-        values.ftCost.toFixed(2) + " บาท";
-
-    beforeVatElement.textContent =
-        values.beforeVat.toFixed(2) + " บาท";
-
-    vatCostElement.textContent =
-        values.vatCost.toFixed(2) + " บาท";
-
-    totalCostElement.textContent =
-        values.totalCost.toFixed(2) + " บาท";
-
-    result.classList.remove("hidden");
+.empty-history .empty-icon {
+    font-size: 35px;
+    margin-bottom: 8px;
 }
 
 
-// =========================
-// เพิ่มประวัติ
-// =========================
+/* ================================
+   ข้อมูลเพิ่มเติม
+================================ */
 
-function addHistory(units, values) {
+.info {
+    margin-top: 20px;
+    padding: 14px;
+    background: #fff7ed;
+    border-radius: 10px;
+    color: #9a3412;
+    font-size: 13px;
+    line-height: 1.6;
+}
 
-    const item = {
-
-        id: createId(),
-
-        units: units,
-
-        baseCost: values.baseCost,
-
-        ftCost: values.ftCost,
-
-        beforeVat: values.beforeVat,
-
-        vatCost: values.vatCost,
-
-        totalCost: values.totalCost,
-
-        date: new Date().toISOString()
-
-    };
-
-    history.unshift(item);
-
-    saveHistory();
-
-    renderHistory();
+.save-info {
+    margin-top: 5px;
+    color: #166534;
 }
 
 
-// =========================
-// ปุ่มคำนวณ
-// =========================
+/* ================================
+   ซ่อน
+================================ */
 
-function calculateElectricity() {
-
-    errorElement.textContent = "";
-
-    const units = Number(unitsInput.value);
-
-    // ตรวจสอบช่องว่าง
-    if (unitsInput.value.trim() === "") {
-
-        errorElement.textContent =
-            "กรุณากรอกจำนวนหน่วยไฟฟ้า";
-
-        result.classList.add("hidden");
-
-        return;
-    }
-
-    // ตรวจสอบตัวเลข
-    if (!Number.isFinite(units)) {
-
-        errorElement.textContent =
-            "กรุณากรอกตัวเลขให้ถูกต้อง";
-
-        result.classList.add("hidden");
-
-        return;
-    }
-
-    // ตรวจสอบค่าติดลบ
-    if (units < 0) {
-
-        errorElement.textContent =
-            "จำนวนหน่วยไฟฟ้าต้องไม่ติดลบ";
-
-        result.classList.add("hidden");
-
-        return;
-    }
-
-    const values = calculateValues(units);
-
-    displayResult(values);
-
-    addHistory(units, values);
+.hidden {
+    display: none !important;
 }
 
 
-// =========================
-// รีเซ็ต
-// =========================
+/* ================================
+   Responsive
+================================ */
 
-function resetCalculator() {
+@media (max-width: 500px) {
 
-    unitsInput.value = "";
-
-    errorElement.textContent = "";
-
-    result.classList.add("hidden");
-
-    unitsInput.focus();
-}
-
-
-// =========================
-// แสดงประวัติ
-// =========================
-
-function renderHistory() {
-
-    historyList.innerHTML = "";
-
-    if (history.length === 0) {
-
-        historyList.innerHTML = `
-            <div class="empty-history">
-                ยังไม่มีประวัติการคำนวณ
-            </div>
-        `;
-
-        return;
-    }
-
-    history.forEach(item => {
-
-        const div = document.createElement("div");
-
-        div.className = "history-item";
-
-        div.innerHTML = `
-
-            <div class="history-main">
-
-                <div class="history-units">
-                    ⚡ ${item.units} kWh
-                </div>
-
-                <div class="history-total">
-                    ${item.totalCost.toFixed(2)} บาท
-                </div>
-
-            </div>
-
-            <div class="history-date">
-                ${formatDate(item.date)}
-            </div>
-
-            <div class="history-actions">
-
-                <button
-                    class="view-btn"
-                    onclick="viewHistory('${item.id}')"
-                >
-                    👁️ ดูรายละเอียด
-                </button>
-
-                <button
-                    class="delete-btn"
-                    onclick="deleteHistory('${item.id}')"
-                >
-                    🗑️ ลบ
-                </button>
-
-            </div>
-        `;
-
-        historyList.appendChild(div);
-    });
-}
-
-
-// =========================
-// ดูรายละเอียดประวัติ
-// =========================
-
-function viewHistory(id) {
-
-    const item = history.find(
-        item => item.id === id
-    );
-
-    if (!item) {
-        return;
+    .calculator {
+        padding: 25px 20px;
     }
 
-    unitsInput.value = item.units;
-
-    displayResult({
-
-        baseCost: item.baseCost,
-
-        ftCost: item.ftCost,
-
-        beforeVat: item.beforeVat,
-
-        vatCost: item.vatCost,
-
-        totalCost: item.totalCost
-
-    });
-
-    showCalculator();
-}
-
-
-// =========================
-// ลบประวัติ
-// =========================
-
-function deleteHistory(id) {
-
-    const index = history.findIndex(
-        item => item.id === id
-    );
-
-    if (index === -1) {
-        return;
+    h1 {
+        font-size: 24px;
     }
 
-    const deletedItem = history.splice(index, 1)[0];
-
-    trash.unshift(deletedItem);
-
-    saveHistory();
-
-    saveTrash();
-
-    renderHistory();
-
-    renderTrash();
-}
-
-
-// =========================
-// แสดงถังขยะ
-// =========================
-
-function renderTrash() {
-
-    trashList.innerHTML = "";
-
-    if (trash.length === 0) {
-
-        trashList.innerHTML = `
-            <div class="empty-history">
-                ถังขยะว่าง
-            </div>
-        `;
-
-        return;
+    .result-row {
+        font-size: 14px;
     }
 
-    trash.forEach(item => {
-
-        const div = document.createElement("div");
-
-        div.className = "history-item";
-
-        div.innerHTML = `
-
-            <div class="history-main">
-
-                <div class="history-units">
-                    ⚡ ${item.units} kWh
-                </div>
-
-                <div class="history-total">
-                    ${item.totalCost.toFixed(2)} บาท
-                </div>
-
-            </div>
-
-            <div class="history-date">
-                ${formatDate(item.date)}
-            </div>
-
-            <div class="history-actions">
-
-                <button
-                    class="restore-btn"
-                    onclick="restoreHistory('${item.id}')"
-                >
-                    ♻️ กู้คืน
-                </button>
-
-                <button
-                    class="permanent-delete-btn"
-                    onclick="permanentlyDelete('${item.id}')"
-                >
-                    ❌ ลบถาวร
-                </button>
-
-            </div>
-        `;
-
-        trashList.appendChild(div);
-    });
-}
-
-
-// =========================
-// กู้คืน
-// =========================
-
-function restoreHistory(id) {
-
-    const index = trash.findIndex(
-        item => item.id === id
-    );
-
-    if (index === -1) {
-        return;
+    .button-group {
+        flex-direction: column;
     }
 
-    const restoredItem = trash.splice(index, 1)[0];
-
-    history.unshift(restoredItem);
-
-    saveHistory();
-
-    saveTrash();
-
-    renderHistory();
-
-    renderTrash();
-}
-
-
-// =========================
-// ลบถาวร
-// =========================
-
-function permanentlyDelete(id) {
-
-    trash = trash.filter(
-        item => item.id !== id
-    );
-
-    saveTrash();
-
-    renderTrash();
-}
-
-
-// =========================
-// แปลงวันที่
-// =========================
-
-function formatDate(dateString) {
-
-    const date = new Date(dateString);
-
-    return date.toLocaleString("th-TH", {
-
-        year: "numeric",
-
-        month: "long",
-
-        day: "numeric",
-
-        hour: "2-digit",
-
-        minute: "2-digit"
-
-    });
-}
-
-
-// =========================
-// เปลี่ยนหน้า
-// =========================
-
-function showCalculator() {
-
-    calculatorPage.classList.remove("hidden");
-
-    historyPage.classList.add("hidden");
-
-    trashPage.classList.add("hidden");
-
-    calculatorTab.classList.add("active");
-
-    historyTab.classList.remove("active");
-}
-
-
-function showHistory() {
-
-    calculatorPage.classList.add("hidden");
-
-    historyPage.classList.remove("hidden");
-
-    trashPage.classList.add("hidden");
-
-    calculatorTab.classList.remove("active");
-
-    historyTab.classList.add("active");
-
-    renderHistory();
-}
-
-
-function showTrash() {
-
-    calculatorPage.classList.add("hidden");
-
-    historyPage.classList.add("hidden");
-
-    trashPage.classList.remove("hidden");
-
-    calculatorTab.classList.remove("active");
-
-    historyTab.classList.remove("active");
-
-    renderTrash();
-}
-
-
-// =========================
-// Event Listeners
-// =========================
-
-calculateBtn.addEventListener(
-    "click",
-    calculateElectricity
-);
-
-resetBtn.addEventListener(
-    "click",
-    resetCalculator
-);
-
-calculatorTab.addEventListener(
-    "click",
-    showCalculator
-);
-
-historyTab.addEventListener(
-    "click",
-    showHistory
-);
-
-trashBtn.addEventListener(
-    "click",
-    showTrash
-);
-
-backHistoryBtn.addEventListener(
-    "click",
-    showHistory
-);
-
-
-// กด Enter เพื่อคำนวณ
-unitsInput.addEventListener(
-    "keydown",
-    function(event) {
-
-        if (event.key === "Enter") {
-
-            calculateElectricity();
-
-        }
-
+    .history-header h2 {
+        font-size: 18px;
     }
-);
 
+    .history-total {
+        font-size: 17px;
+    }
 
-// =========================
-// เริ่มต้นระบบ
-// =========================
+    .history-top {
+        flex-direction: column;
+    }
 
-renderHistory();
+    .tabs {
+        gap: 5px;
+    }
 
-renderTrash();
+    .tab {
+        font-size: 13px;
+    }
+}
