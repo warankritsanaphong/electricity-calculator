@@ -37,9 +37,50 @@ h1 {
 .subtitle {
     text-align: center;
     color: #6b7280;
-    margin-bottom: 30px;
+    margin-bottom: 25px;
     line-height: 1.6;
 }
+
+
+/* ================================
+   แท็บ
+================================ */
+
+.tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 25px;
+    background: #f3f4f6;
+    padding: 5px;
+    border-radius: 12px;
+}
+
+.tab {
+    flex: 1;
+    border: none;
+    background: transparent;
+    color: #6b7280;
+    padding: 11px 8px;
+    border-radius: 9px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.tab:hover {
+    background: #e5e7eb;
+}
+
+.tab.active {
+    background: #2563eb;
+    color: white;
+}
+
+
+/* ================================
+   ฟอร์ม
+================================ */
 
 .form-group {
     margin-bottom: 20px;
@@ -73,6 +114,11 @@ input:focus {
     min-height: 20px;
 }
 
+
+/* ================================
+   ปุ่ม
+================================ */
+
 .button-group {
     display: flex;
     gap: 12px;
@@ -80,7 +126,6 @@ input:focus {
 }
 
 button {
-    flex: 1;
     border: none;
     padding: 14px;
     border-radius: 10px;
@@ -88,6 +133,10 @@ button {
     font-weight: bold;
     cursor: pointer;
     transition: 0.2s;
+}
+
+.button-group button {
+    flex: 1;
 }
 
 .calculate-btn {
@@ -108,6 +157,11 @@ button {
 .reset-btn:hover {
     background: #d1d5db;
 }
+
+
+/* ================================
+   ผลการคำนวณ
+================================ */
 
 .result {
     margin-top: 30px;
@@ -155,6 +209,132 @@ button {
     color: #1d4ed8;
 }
 
+
+/* ================================
+   ประวัติ
+================================ */
+
+.history-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 18px;
+}
+
+.history-header h2 {
+    color: #1e40af;
+    font-size: 21px;
+}
+
+.history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.history-item {
+    background: #f8fafc;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 15px;
+}
+
+.history-top {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    align-items: flex-start;
+}
+
+.history-date {
+    color: #6b7280;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.history-units {
+    font-size: 15px;
+    margin-top: 6px;
+}
+
+.history-total {
+    color: #1d4ed8;
+    font-size: 20px;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.history-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.history-actions button {
+    flex: 1;
+    padding: 9px;
+    font-size: 13px;
+}
+
+.restore-btn {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.restore-btn:hover {
+    background: #bbf7d0;
+}
+
+.delete-btn {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+.delete-btn:hover {
+    background: #fecaca;
+}
+
+.trash-btn {
+    background: #f3f4f6;
+    color: #374151;
+    padding: 9px 12px;
+    font-size: 13px;
+}
+
+.trash-btn:hover {
+    background: #e5e7eb;
+}
+
+.small-btn {
+    padding: 9px 12px;
+    font-size: 13px;
+}
+
+
+/* ================================
+   ไม่มีข้อมูล
+================================ */
+
+.empty-history {
+    text-align: center;
+    padding: 30px 15px;
+    color: #6b7280;
+    background: #f8fafc;
+    border-radius: 12px;
+    border: 1px dashed #d1d5db;
+}
+
+.empty-history .empty-icon {
+    font-size: 35px;
+    margin-bottom: 8px;
+}
+
+
+/* ================================
+   ข้อมูลเพิ่มเติม
+================================ */
+
 .info {
     margin-top: 20px;
     padding: 14px;
@@ -165,11 +345,27 @@ button {
     line-height: 1.6;
 }
 
-.hidden {
-    display: none;
+.save-info {
+    margin-top: 5px;
+    color: #166534;
 }
 
+
+/* ================================
+   ซ่อน
+================================ */
+
+.hidden {
+    display: none !important;
+}
+
+
+/* ================================
+   Responsive
+================================ */
+
 @media (max-width: 500px) {
+
     .calculator {
         padding: 25px 20px;
     }
@@ -184,5 +380,25 @@ button {
 
     .button-group {
         flex-direction: column;
+    }
+
+    .history-header h2 {
+        font-size: 18px;
+    }
+
+    .history-total {
+        font-size: 17px;
+    }
+
+    .history-top {
+        flex-direction: column;
+    }
+
+    .tabs {
+        gap: 5px;
+    }
+
+    .tab {
+        font-size: 13px;
     }
 }
