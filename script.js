@@ -1,193 +1,187 @@
-// ================================
-// ตั้งค่าอัตราค่าไฟ
-// ================================
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เครื่องคำนวณค่าไฟฟ้า</title>
+    <link rel="stylesheet" href="style.css">
+</head>
 
-// ค่า Ft ตัวอย่าง: บาท/หน่วย
-const FT_RATE = 0.3972;
+<body>
 
-// VAT
-const VAT_RATE = 0.07;
+    <div class="container">
 
+        <div class="calculator">
 
-// ================================
-// ฟังก์ชันคำนวณค่าไฟฐาน
-// ================================
+            <h1>⚡ เครื่องคำนวณค่าไฟฟ้า</h1>
 
-function calculateBaseCost(units) {
+            <p class="subtitle">
+                คำนวณค่าไฟฟ้าโดยประมาณจากจำนวนหน่วยไฟฟ้า
+            </p>
 
-    let cost = 0;
+            <!-- แท็บ -->
+            <div class="tabs">
+                <button id="calculatorTab" class="tab active">
+                    🧮 เครื่องคำนวณ
+                </button>
 
-    /*
-        ตัวอย่างอัตราค่าไฟแบบขั้นบันได
-
-        0 - 15 หน่วย       = 2.3488 บาท/หน่วย
-        16 - 25 หน่วย      = 2.9882 บาท/หน่วย
-        26 - 35 หน่วย      = 3.2405 บาท/หน่วย
-        36 - 100 หน่วย     = 3.6237 บาท/หน่วย
-        101 - 150 หน่วย    = 3.7171 บาท/หน่วย
-        151 - 400 หน่วย    = 4.2218 บาท/หน่วย
-        มากกว่า 400 หน่วย  = 4.4217 บาท/หน่วย
-    */
-
-    const steps = [
-        { max: 15, rate: 2.3488 },
-        { max: 25, rate: 2.9882 },
-        { max: 35, rate: 3.2405 },
-        { max: 100, rate: 3.6237 },
-        { max: 150, rate: 3.7171 },
-        { max: 400, rate: 4.2218 },
-        { max: Infinity, rate: 4.4217 }
-    ];
-
-    let previousMax = 0;
-    let remainingUnits = units;
-
-    for (const step of steps) {
-
-        if (remainingUnits <= 0) {
-            break;
-        }
-
-        const availableUnits = step.max === Infinity
-            ? remainingUnits
-            : step.max - previousMax;
-
-        const usedUnits = Math.min(
-            remainingUnits,
-            availableUnits
-        );
-
-        cost += usedUnits * step.rate;
-
-        remainingUnits -= usedUnits;
-
-        if (step.max !== Infinity) {
-            previousMax = step.max;
-        }
-    }
-
-    return cost;
-}
+                <button id="historyTab" class="tab">
+                    📋 ประวัติ
+                </button>
+            </div>
 
 
-// ================================
-// คำนวณค่าไฟ
-// ================================
+            <!-- =========================
+                 หน้าเครื่องคำนวณ
+            ========================== -->
 
-function calculateElectricity() {
+            <div id="calculatorPage">
 
-    const unitsInput = document.getElementById("units");
-    const error = document.getElementById("error");
-    const result = document.getElementById("result");
+                <div class="form-group">
 
-    const units = parseFloat(unitsInput.value);
+                    <label for="units">
+                        จำนวนหน่วยไฟฟ้า (kWh)
+                    </label>
 
-    // ตรวจสอบข้อมูล
-    if (unitsInput.value.trim() === "") {
-        error.textContent = "กรุณากรอกจำนวนหน่วยไฟฟ้า";
-        result.classList.add("hidden");
-        return;
-    }
+                    <input
+                        type="number"
+                        id="units"
+                        min="0"
+                        step="0.01"
+                        placeholder="เช่น 150"
+                    >
 
-    if (isNaN(units)) {
-        error.textContent = "กรุณากรอกตัวเลขเท่านั้น";
-        result.classList.add("hidden");
-        return;
-    }
+                    <small id="error" class="error"></small>
 
-    if (units < 0) {
-        error.textContent = "จำนวนหน่วยไฟฟ้าต้องไม่ติดลบ";
-        result.classList.add("hidden");
-        return;
-    }
-
-    error.textContent = "";
-
-    // ค่าไฟฐาน
-    const baseCost = calculateBaseCost(units);
-
-    // ค่า Ft
-    const ftCost = units * FT_RATE;
-
-    // รวมก่อน VAT
-    const beforeVat = baseCost + ftCost;
-
-    // VAT
-    const vatCost = beforeVat * VAT_RATE;
-
-    // ยอดรวม
-    const totalCost = beforeVat + vatCost;
+                </div>
 
 
-    // แสดงผล
-    document.getElementById("baseCost").textContent =
-        `${baseCost.toFixed(2)} บาท`;
+                <div class="button-group">
 
-    document.getElementById("ftCost").textContent =
-        `${ftCost.toFixed(2)} บาท`;
+                    <button
+                        id="calculateBtn"
+                        class="calculate-btn"
+                    >
+                        คำนวณ
+                    </button>
 
-    document.getElementById("beforeVat").textContent =
-        `${beforeVat.toFixed(2)} บาท`;
+                    <button
+                        id="resetBtn"
+                        class="reset-btn"
+                    >
+                        รีเซ็ต
+                    </button>
 
-    document.getElementById("vatCost").textContent =
-        `${vatCost.toFixed(2)} บาท`;
-
-    document.getElementById("totalCost").textContent =
-        `${totalCost.toFixed(2)} บาท`;
-
-    result.classList.remove("hidden");
-}
-
-
-// ================================
-// ฟังก์ชันรีเซ็ต
-// ================================
-
-function resetCalculator() {
-
-    document.getElementById("units").value = "";
-
-    document.getElementById("error").textContent = "";
-
-    document.getElementById("result").classList.add("hidden");
-
-    document.getElementById("baseCost").textContent =
-        "0.00 บาท";
-
-    document.getElementById("ftCost").textContent =
-        "0.00 บาท";
-
-    document.getElementById("beforeVat").textContent =
-        "0.00 บาท";
-
-    document.getElementById("vatCost").textContent =
-        "0.00 บาท";
-
-    document.getElementById("totalCost").textContent =
-        "0.00 บาท";
-}
+                </div>
 
 
-// ================================
-// ปุ่มต่าง ๆ
-// ================================
+                <!-- ผลการคำนวณ -->
 
-document
-    .getElementById("calculateBtn")
-    .addEventListener("click", calculateElectricity);
+                <div id="result" class="result hidden">
 
-document
-    .getElementById("resetBtn")
-    .addEventListener("click", resetCalculator);
+                    <h2>ผลการคำนวณ</h2>
+
+                    <div class="result-row">
+                        <span>ค่าไฟฟ้าฐาน</span>
+                        <strong id="baseCost">0.00 บาท</strong>
+                    </div>
+
+                    <div class="result-row">
+                        <span>ค่า Ft</span>
+                        <strong id="ftCost">0.00 บาท</strong>
+                    </div>
+
+                    <div class="result-row">
+                        <span>ก่อน VAT</span>
+                        <strong id="beforeVat">0.00 บาท</strong>
+                    </div>
+
+                    <div class="result-row">
+                        <span>VAT 7%</span>
+                        <strong id="vatCost">0.00 บาท</strong>
+                    </div>
+
+                    <div class="total">
+                        <span>ยอดรวมค่าไฟโดยประมาณ</span>
+                        <strong id="totalCost">0.00 บาท</strong>
+                    </div>
+
+                </div>
+
+            </div>
 
 
-// กด Enter เพื่อคำนวณ
-document
-    .getElementById("units")
-    .addEventListener("keydown", function(event) {
+            <!-- =========================
+                 หน้าประวัติ
+            ========================== -->
 
-        if (event.key === "Enter") {
-            calculateElectricity();
-        }
+            <div id="historyPage" class="hidden">
 
-    });
+                <div class="history-header">
+
+                    <h2>📋 ประวัติการคำนวณ</h2>
+
+                    <button
+                        id="trashBtn"
+                        class="trash-btn"
+                    >
+                        🗑️ ถังขยะ
+                    </button>
+
+                </div>
+
+
+                <div id="historyList" class="history-list">
+                    <!-- JavaScript จะสร้างประวัติที่นี่ -->
+                </div>
+
+            </div>
+
+
+            <!-- =========================
+                 หน้าถังขยะ
+            ========================== -->
+
+            <div id="trashPage" class="hidden">
+
+                <div class="history-header">
+
+                    <h2>♻️ ถังขยะ</h2>
+
+                    <button
+                        id="backHistoryBtn"
+                        class="reset-btn small-btn"
+                    >
+                        ← กลับ
+                    </button>
+
+                </div>
+
+
+                <div id="trashList" class="history-list">
+                    <!-- JavaScript จะสร้างข้อมูลที่ถูกลบที่นี่ -->
+                </div>
+
+            </div>
+
+
+            <div class="info">
+                <p>
+                    💡 ผลการคำนวณเป็นเพียงค่าประมาณ
+                    และอาจแตกต่างจากใบแจ้งค่าไฟจริง
+                </p>
+
+                <p class="save-info">
+                    💾 ประวัติจะถูกบันทึกไว้ในเครื่องโดยอัตโนมัติ
+                </p>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <script src="script.js"></script>
+
+</body>
+</html>
